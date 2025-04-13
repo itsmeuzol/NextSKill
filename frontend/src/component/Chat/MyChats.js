@@ -1,19 +1,18 @@
 import { AddIcon } from "@chakra-ui/icons";
 import { Box, Button, Stack, Text, useToast } from "@chakra-ui/react";
 import axios from "axios";
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { getSender } from "../../config/ChatLogic";
 import { ChatState } from "../../context/ChatProvider";
 import { accessUserChat } from "../../utils/APIRoutes";
 import ChatLoading from "./ChatLoading";
 import GroupChatModal from "./Modals/GroupChatModal";
-const MyChats = ({ fetchAgain }) => {
-  const [loggedUser, setLoggedUser] = useState();
-  const { setSelectedChat, selectedChat, chats, setChats, user } = ChatState();
 
+const MyChats = ({ fetchAgain }) => {
+  const { setSelectedChat, selectedChat, chats, setChats, user } = ChatState();
   const toast = useToast();
 
-  const fetchChat = async (userId) => {
+  const fetchChat = async () => {
     const token = localStorage.getItem("token");
 
     try {
@@ -24,9 +23,7 @@ const MyChats = ({ fetchAgain }) => {
         },
       };
 
-      const { data } = await axios.get(accessUserChat, config, { userId });
-
-      console.log(data);
+      const { data } = await axios.get(accessUserChat, config);
       setChats(data);
     } catch (error) {
       toast({
@@ -41,9 +38,10 @@ const MyChats = ({ fetchAgain }) => {
   };
 
   useEffect(() => {
-    setLoggedUser(JSON.parse(localStorage.getItem("user")));
-    fetchChat();
-  }, [fetchAgain]);
+    if (user) {
+      fetchChat();
+    }
+  }, [fetchAgain, user]);
 
   return (
     <Box
@@ -76,6 +74,7 @@ const MyChats = ({ fetchAgain }) => {
           </Button>
         </GroupChatModal>
       </Box>
+
       <Box
         display="flex"
         flexDirection="column"
@@ -87,28 +86,25 @@ const MyChats = ({ fetchAgain }) => {
         overflowY="hidden"
       >
         {chats ? (
-          <Stack overflowy="scroll">
-            {chats.map((chat) => {
-              console.log(chat);
-              return (
-                <Box
-                  onClick={() => setSelectedChat(chat)}
-                  key={chat._id}
-                  cursor="pointer"
-                  borderRadius="lg"
-                  bg={selectedChat === chat ? "#38b2ac" : "e8e8e8"}
-                  color={selectedChat === chat ? "white" : "black"}
-                  px={3}
-                  py={2}
-                >
-                  <Text>
-                    {!chat.isGroupChat
-                      ? getSender(loggedUser, chat.users)
-                      : chat.chatName}
-                  </Text>
-                </Box>
-              );
-            })}
+          <Stack overflowY="scroll">
+            {chats.map((chat) => (
+              <Box
+                onClick={() => setSelectedChat(chat)}
+                key={chat._id}
+                cursor="pointer"
+                borderRadius="lg"
+                bg={selectedChat === chat ? "#38b2ac" : "#e8e8e8"}
+                color={selectedChat === chat ? "white" : "black"}
+                px={3}
+                py={2}
+              >
+                <Text>
+                  {!chat.isGroupChat
+                    ? getSender(user, chat.users)
+                    : chat.chatName}
+                </Text>
+              </Box>
+            ))}
           </Stack>
         ) : (
           <ChatLoading />

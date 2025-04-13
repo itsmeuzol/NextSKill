@@ -36,15 +36,18 @@ const UpdateGroupChatModal = ({ fetchAgain, setFetchAgain, fetchMessages }) => {
   const [search, setSearch] = useState("");
   const [searchResult, setSearchResult] = useState([]);
   const [loading, setLoading] = useState(false);
-
   const [renameLoading, setRenameLoading] = useState(false);
 
   const toast = useToast();
+
   const handleRemove = async (user1) => {
-    if (selectedChat.groupAdmin._id !== user._id && user1._id !== user._id) {
+    const isAdmin = selectedChat?.groupAdmin?._id === user._id;
+    const isSelf = user1._id === user._id;
+
+    if (!isAdmin && !isSelf) {
       toast({
-        title: "User is not admin",
-        description: "Only Admin has this permission",
+        title: "Permission Denied",
+        description: "Only admin can remove others",
         status: "error",
         duration: 3000,
         isClosable: true,
@@ -52,13 +55,15 @@ const UpdateGroupChatModal = ({ fetchAgain, setFetchAgain, fetchMessages }) => {
       });
       return;
     }
+
     try {
-      const token = await JSON.parse(localStorage.getItem("token"));
+      const token = localStorage.getItem("token");
+      if (!token) throw new Error("Token is missing");
+
       const config = {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+        headers: { Authorization: `Bearer ${token}` },
       };
+
       const { data } = await axios.put(
         groupRemove,
         {
@@ -67,10 +72,17 @@ const UpdateGroupChatModal = ({ fetchAgain, setFetchAgain, fetchMessages }) => {
         },
         config
       );
-      user1._id === user._id ? setSelectedChat() : setSelectedChat(data);
+
+      if (isSelf && selectedChat.groupAdmin._id === user._id) {
+        // Admin leaving: delete group or handle appropriately
+        setSelectedChat();
+        // Optionally call an API to delete the group permanently
+      } else {
+        setSelectedChat(data);
+      }
+
       setFetchAgain(!fetchAgain);
       fetchMessages();
-      setLoading(false);
     } catch (e) {
       console.log(e);
       toast({
@@ -81,14 +93,16 @@ const UpdateGroupChatModal = ({ fetchAgain, setFetchAgain, fetchMessages }) => {
         isClosable: true,
         position: "top",
       });
+    } finally {
       setLoading(false);
     }
   };
+
   const handleAddUser = async (user1) => {
     if (selectedChat.users.find((u) => u._id === user1._id)) {
       toast({
         title: "User already added",
-        description: "User already added to group",
+        description: "User is already in the group",
         status: "error",
         duration: 3000,
         isClosable: true,
@@ -98,8 +112,8 @@ const UpdateGroupChatModal = ({ fetchAgain, setFetchAgain, fetchMessages }) => {
     }
     if (selectedChat.groupAdmin._id !== user._id) {
       toast({
-        title: "User is not admin",
-        description: "Only Admin has this permission",
+        title: "Permission Denied",
+        description: "Only admin can add users",
         status: "error",
         duration: 3000,
         isClosable: true,
@@ -109,7 +123,7 @@ const UpdateGroupChatModal = ({ fetchAgain, setFetchAgain, fetchMessages }) => {
     }
     try {
       setLoading(true);
-      const token = await JSON.parse(localStorage.getItem("token"));
+      const token = localStorage.getItem("token");
       const config = {
         headers: {
           "Content-Type": "application/json",
@@ -126,7 +140,6 @@ const UpdateGroupChatModal = ({ fetchAgain, setFetchAgain, fetchMessages }) => {
       );
       setSelectedChat(data);
       setFetchAgain(!fetchAgain);
-      setLoading(false);
     } catch (e) {
       toast({
         title: "Error",
@@ -136,15 +149,17 @@ const UpdateGroupChatModal = ({ fetchAgain, setFetchAgain, fetchMessages }) => {
         isClosable: true,
         position: "bottom",
       });
+    } finally {
+      setLoading(false);
+      setSearch([]);
     }
-    setSearch([]);
   };
 
   const handleRename = async () => {
     if (!groupChatName) return;
     try {
       setRenameLoading(true);
-      const token = await JSON.parse(localStorage.getItem("token"));
+      const token = localStorage.getItem("token");
       const config = {
         headers: {
           "Content-Type": "application/json",
@@ -161,47 +176,51 @@ const UpdateGroupChatModal = ({ fetchAgain, setFetchAgain, fetchMessages }) => {
       );
       setSelectedChat(data);
       setFetchAgain(!fetchAgain);
-      setRenameLoading(false);
     } catch (err) {
-      console.log(err);
+      const errorMessage =
+        err.response?.data?.message || "Error renaming group";
       toast({
         title: "Error",
-        description: err.response.data.message,
+        description: errorMessage,
         status: "error",
         duration: 3000,
         isClosable: true,
         position: "bottom",
       });
+    } finally {
       setRenameLoading(false);
+      setGroupChatName("");
     }
-    setGroupChatName("");
   };
 
   const handleSearch = async (query) => {
     setSearch(query);
-
     if (!query) {
+      setSearchResult([]);
       return;
     }
+
     try {
-      setLoading(true);
-      const token = await JSON.parse(localStorage.getItem("token"));
+      const token = localStorage.getItem("token");
       const config = {
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
       };
+
       const { data } = await axios.get(
-        chatUserSearch + `search=${search}`,
+        `${chatUserSearch}?search=${query}`,
         config
       );
-      setSearchResult(data);
-      setLoading(false);
+      const filtered = data.filter(
+        (u) => !selectedChat.users.find((chatUser) => chatUser._id === u._id)
+      );
+      setSearchResult(filtered);
     } catch (error) {
       toast({
         title: "Error",
-        description: error.message,
+        description: "Failed to load search results",
         status: "error",
         duration: 5000,
         isClosable: true,
@@ -217,7 +236,6 @@ const UpdateGroupChatModal = ({ fetchAgain, setFetchAgain, fetchMessages }) => {
         display={{ base: "flex" }}
         icon={<ViewIcon />}
       />
-
       <Modal isOpen={isOpen} onClose={onClose} isCentered>
         <ModalOverlay />
         <ModalContent>
@@ -225,16 +243,15 @@ const UpdateGroupChatModal = ({ fetchAgain, setFetchAgain, fetchMessages }) => {
           <ModalCloseButton />
           <ModalBody>
             <Box width="100%" display="flex" flexWrap="wrap" pb={3}>
-              {selectedChat.users.map((user1) => {
-                return (
-                  <UserBadgeItem
-                    key={user1._id}
-                    user={user1}
-                    handleFunction={() => handleRemove(user1)}
-                  />
-                );
-              })}
+              {selectedChat.users.map((user1) => (
+                <UserBadgeItem
+                  key={user1._id}
+                  user={user1}
+                  handleFunction={() => handleRemove(user1)}
+                />
+              ))}
             </Box>
+
             <FormControl display="flex">
               <Input
                 placeholder="Chat Name"
@@ -252,25 +269,27 @@ const UpdateGroupChatModal = ({ fetchAgain, setFetchAgain, fetchMessages }) => {
                 Update
               </Button>
             </FormControl>
+
             <FormControl>
               <Input
-                placeholder="Add Users eg: Chirag, John...."
+                placeholder="Add Users eg: Chirag, John..."
                 mb={1}
                 onChange={(e) => handleSearch(e.target.value)}
               />
             </FormControl>
+
             {loading ? (
               <Spinner size="lg" />
             ) : (
-              searchResult?.splice(0, 4).map((user1) => {
-                return (
+              searchResult
+                .slice(0, 4)
+                .map((user1) => (
                   <UserListItem
                     key={user1._id}
                     user={user1}
                     handleFunction={() => handleAddUser(user1)}
                   />
-                );
-              })
+                ))
             )}
           </ModalBody>
 

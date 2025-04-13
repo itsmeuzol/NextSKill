@@ -12,7 +12,6 @@ import {
   JobDetail,
   PostEditPage,
   SharedLayout2,
-  LandingPage,
   ExplorePage,
   MessagePage,
   SharedLayout3,
@@ -66,7 +65,7 @@ function App() {
             path="/"
             element={
               <IsLoggedin>
-                <LandingPage />
+                <LoginPage />
               </IsLoggedin>
             }
           />

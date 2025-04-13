@@ -22,7 +22,6 @@ import {
 } from "@chakra-ui/react";
 import axios from "axios";
 import React, { useState } from "react";
-import NotificationBadge, { Effect } from "react-notification-badge";
 import { useNavigate } from "react-router-dom";
 import { getSender } from "../../config/ChatLogic";
 import { useAppContext } from "../../context/appContext";
@@ -118,34 +117,26 @@ const SideDrawer = () => {
   };
   return (
     <>
-      <Box
-        display="flex"
-        justifyContent="space-between"
-        w="100%"
-        p="5px 10px 5px 10px"
-        bg="white"
-        borderWidth="5px"
-        alignItems="center"
-      >
+      <div className="flex justify-between w-full p-2.5 bg-white border-2 border-gray-200 items-center">
         <Tooltip label="Search Users" placement="bottom" hasArrow>
-          <Button variant="ghost" onClick={onOpen}>
-            <i class="fa fa-search" aria-hidden="true"></i>
-            <Text display={{ base: "none", md: "flex" }} px="4">
-              Search User
-            </Text>
-          </Button>
+          <button
+            className="bg-transparent hover:bg-gray-200 text-gray-800 font-semibold py-2 px-4 border border-gray-400 rounded shadow"
+            onClick={onOpen}
+          >
+            <i className="fa fa-search" aria-hidden="true"></i>
+            <span className="hidden md:inline-block px-4">Search User</span>
+          </button>
         </Tooltip>
 
-        <Text fontSize="2x1" fontWeight="bold">
-          Next Skill Messenger
-        </Text>
-        <div>
+        <span className="text-2xl font-bold">
+          Welcome to Next Skill Messenger
+        </span>
+        <div className="flex items-center">
           <Menu>
-            <MenuButton p={1}>
-              <NotificationBadge count={notification.length} effect={Effect} />
-              <BellIcon fontSize="2xl" m={1} />
+            <MenuButton className="p-1">
+              <BellIcon className="text-2xl m-1" />
             </MenuButton>
-            <MenuList pl={2}>
+            <MenuList className="pl-2">
               {!notification.length && "No New Messages"}
               {notification.map((notif) => {
                 return (
@@ -165,7 +156,7 @@ const SideDrawer = () => {
             </MenuList>
           </Menu>
           <Menu>
-            <MenuButton as={Button} rightIcom={<ChevronRightIcon />}>
+            <MenuButton as={Button} rightIcon={<ChevronRightIcon />}>
               <Avatar
                 size="sm"
                 cursor="pointer"
@@ -183,29 +174,34 @@ const SideDrawer = () => {
                   }
                 }}
               >
-                My Dashboard
+                {user.username} dashboard
               </MenuItem>
               <MenuDivider />
               {/* <MenuItem onClick={logoutHandler}>Logout</MenuItem> */}
             </MenuList>
           </Menu>
         </div>
-      </Box>
+      </div>
 
       <Drawer placement="left" onClose={onClose} isOpen={isOpen}>
         <DrawerOverlay />
         <DrawerContent>
           <DrawerHeader borderBottomWidth="1px">Search Users</DrawerHeader>
           <DrawerBody>
-            <Box display="flex">
-              <Input
+            <div className="flex">
+              <input
+                className="flex-grow p-2 border border-gray-300 rounded mr-2"
                 placeholder="Search by name or email"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                mr={2}
               />
-              <Button onClick={handleSearch}>Go</Button>
-            </Box>
+              <button
+                className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 transition-colors"
+                onClick={handleSearch}
+              >
+                Go
+              </button>
+            </div>
             {loading ? (
               <ChatLoading />
             ) : (
@@ -220,7 +216,7 @@ const SideDrawer = () => {
               })
             )}
 
-            {loadingChat && <Spinner ml="auto" display="flex" />}
+            {loadingChat && <Spinner className="ml-auto flex" />}
           </DrawerBody>
         </DrawerContent>
       </Drawer>

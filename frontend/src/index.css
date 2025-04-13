@@ -1,4 +1,9 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 @import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap");
+
 @font-face {
   font-family: "MADE Soulmaze Outline Regular";
   font-style: normal;
@@ -6,6 +11,7 @@
   src: local("MADE Soulmaze Outline Regular"),
     url("../src/assets/fonts/MADE\ Soulmaze\ PERSONAL\ USE.woff") format("woff");
 }
+
 *,
 *::before,
 *::after {
@@ -21,60 +27,67 @@ html {
 }
 :root {
   --inter-font: "Inter", sans-serif;
-  --primary-color: #b7c9e5;
-  --secodary-color: #d2e9ed;
+
+  --primary-color: #5e60ce; /* Slightly darker vibrant blue */
+  --secondary-color: #6cacc8; /* Lighter teal */
   --white-color: #ffffff;
   --black-color: black;
   --border-radius: 2rem;
 
-  /* grey */
-  --grey-50: #f0f4f8;
-  --grey-100: #d9e2ec;
-  --grey-200: #bcccdc;
-  --grey-300: #9fb3c8;
-  --grey-400: #829ab1;
-  --grey-500: #627d98;
-  --grey-600: #486581;
-  --grey-700: #334e68;
-  --grey-800: #243b53;
-  --grey-900: #102a43;
+  /* Grey Scale */
+  --grey-50: #f1f3f5;  /* Slightly darker */
+  --grey-100: #e2e6ea;
+  --grey-200: #d0d4d9;
+  --grey-300: #b0b6bd;
+  --grey-400: #8f949b;
+  --grey-500: #5e666f;
+  --grey-600: #3e464d;
+  --grey-700: #1e272e;
+  --grey-800: #101417;
+  --grey-900: #3e81d9;
 
-  --blue-100: #afcdcd23;
-  --blue-200: #f6ffff;
-  --blue-300: #d7e8ee;
-  --blue-400: #a9c2f0;
-  --blue-500: #a0bdf3;
-
-  --blue-600: #c6f6f6;
-  --blue-700: #5555ff;
-  --blue-900: #2db9e9;
-
-  --light-blue-100: #ebeefd;
-  --light-blue-500: #c0f4ff;
-  --dark-purple:#5555ff;
-
-  --light-blue-600: #75a8d2;
-  --light-purple: #8698ee;
+  /* Blue Scale */
+  --blue-100: #d1e4f9;
+  --blue-200: #a3c9f2;
+  --blue-300: #70a8e6;
+  --blue-400: #4388db;
+  --blue-500: #275eaf; /* Same blue but with slight lighter tone */
+  --blue-600: #1f0ae0;
+  --blue-700: #445bfc; /* Slightly deeper blue */
+  --blue-900: #31a6d7; /* Changed blue to match a deeper tone */
 
   --blue-1000: #4979d1;
   --blue-1100: #2457c5;
   --blue-1200: #2f76f8;
 
-  --black-800: #533e3e;
-  --black-650: #000000;
-  --black-600: #596568;
-  --black-550: #5e5f60;
-  --black-500: #a7a7a7;
-  --black-300: #d9d9d9;
+  --light-blue-100: #e6f0ff;
+  --light-blue-500: #4084bb; /* Adjusted light blue */
+  --dark-purple: #4d4dff; /* Slightly darker purple */
 
-  --light-red: #eab0b0;
-  --light-green: #b8eab0;
+  --light-blue-600: #6b8cb2;
+  --light-purple: #7a8ddf;
+
+  /* Status Colors */
+  --success-color: #33c88c;
+  --warning-color: #f4a261;
+  --danger-color: #f77474;
+  --info-color: #4ab3bb;
+
+  --black-800: #3d2a2a;
+  --black-650: #292929;
+  --black-600: #4b555a;
+  --black-550: #585c5e;
+  --black-500: #9a9a9a;
+  --black-300: #d0d0d0;
+
+  --light-red: #f1c2c2;
+  --light-green: #a4f1a4;
 
   --border-radius: 2rem;
-  --red-light: #f8d7da;
-  --red-dark: #842029;
-  --green-light: #d1e7dd;
-  --green-dark: #0f5132;
+  --red-light: #fad2d2;
+  --red-dark: #9e1c1c;
+  --green-light: #c4e9c4;
+  --green-dark: #0d3a29;
 
   --transparent-black: rgba(0, 0, 0, 0.641);
 
@@ -89,11 +102,6 @@ html {
 
   --fw-normal: 400;
   --fw-bold: 700;
-
-  --clr: #b7c9e5;
-
-
-  
 }
 
 ::-webkit-scrollbar {
@@ -102,7 +110,7 @@ html {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(75, 153, 167, 0.9);
+  background: rgba(48, 132, 145, 0.9);
 
   border-radius: 10px;
   filter: blur(200px);
@@ -159,7 +167,7 @@ img {
 .heading4 {
   font-weight: bolder;
   font-size: 1.1rem;
-  color: var(--blue-700);
+  color: var(--blue-600);
 }
 
 .btn-clear {

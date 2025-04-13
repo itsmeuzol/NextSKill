@@ -108,10 +108,11 @@ const GroupChatModal = ({ children }) => {
         group,
         {
           groupName: groupName,
-          users: selectedUsers.map((u) => u._id), // Send array, not JSON string
+          users: selectedUsers.map((u) => u._id), // ✅ clean and correct
         },
         config
       );
+      console.log("Selected Users:", selectedUsers);
 
       console.log("Response Data:", response.data); // Debug response
 

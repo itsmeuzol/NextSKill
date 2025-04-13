@@ -23,15 +23,16 @@ const SearchContainer = ({ applyFilters, handleChange }) => {
         <div className="heading6">Search</div>
         <div className="searchbox ">
           <div className="searchbar">
-            <BiSearch className="search-icon" />
+            <BiSearch className="search-icon" color="white" />{" "}
             <input
               type="text"
-              className="search-input"
+              className="search-input placeholder-white"
               placeholder="Enter Job Title"
               name="title"
               onChange={handleChange}
             />
           </div>
+
           <div className="sort-by">
             <button onClick={applyFilters}>Filter</button>
           </div>
